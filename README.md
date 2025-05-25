@@ -1,4 +1,19 @@
+# LLM Table Generator
+
+AI-powered table generator using Next.js and Google Gemini.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Setup
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Create `.env.local` and add your Google AI API key
+4. Run the development server: `npm run dev`
+
+## Environment Variables
+
+- `GOOGLE_GENERATIVE_AI_API_KEY` - Your Google Generative AI API key
 
 ## Getting Started
 

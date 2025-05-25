@@ -10,8 +10,8 @@ export interface Action {
 }
 
 export interface TableRow {
-  [key: string]: any
-  actions?: Action[]
+  [key: string]: string | number | boolean | undefined | null | Action[]
+  actions: Action[]
 }
 
 export interface TableData {

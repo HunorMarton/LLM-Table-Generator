@@ -1,0 +1,1 @@
+export const MIN_TEXTAREA_HEIGHT = 230
