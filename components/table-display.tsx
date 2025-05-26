@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import type { TableData, TableColumn, TableRow as RowType } from '@/lib/types'
 import { Table, TableBody, TableRow } from '@/components/ui/table'
 import DataCell from './data-cell'
-import ActionsCell from './actions-cell'
+import StickyShadowCell from './sticky-shadow-cell'
+import ActionsRenderer from './actions-renderer'
 
 interface TableDisplayProps {
   tableData: TableData
@@ -65,10 +66,9 @@ export default function TableDisplay({
                       />
                     )
                   )}
-                  <ActionsCell
-                    actions={row.actions}
-                    isScrolledToRight={isScrolledToRight}
-                  />
+                  <StickyShadowCell showShadow={!isScrolledToRight}>
+                    <ActionsRenderer actions={row.actions} />
+                  </StickyShadowCell>
                 </TableRow>
               ))}
             </TableBody>
