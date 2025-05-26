@@ -7,6 +7,8 @@ import DataCell from './data-cell'
 import StickyShadowCell from './sticky-shadow-cell'
 import ActionsRenderer from './actions-renderer'
 
+import { cn } from '@/lib/utils'
+
 interface TableDisplayProps {
   tableData: TableData
   isStale?: boolean
@@ -40,11 +42,9 @@ export default function TableDisplay({
   }
 
   return (
-    <div
-      className={`w-full ${isStale ? 'opacity-50 pointer-events-none' : ''}`}
-    >
+    <div className={cn('w-full', isStale && 'opacity-50 pointer-events-none')}>
       {tableData.title && (
-        <h2 className="font-medium text-sm leading-5 tracking-normal text-[#A6A6A6] mb-3">
+        <h2 className="font-medium text-sm leading-5 tracking-normal text-black/50 mb-3">
           {tableData.title}
         </h2>
       )}

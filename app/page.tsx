@@ -31,7 +31,7 @@ export default function Home() {
   const currentError = queryError ? queryError.message : null
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#F4F4F1]">
+    <main className="min-h-screen overflow-hidden bg-gray-100">
       {/* Content container - uses flex for compact layout, grid for large screen */}
       <div
         className={`p-4 md:p-6 w-full min-h-screen 
