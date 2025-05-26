@@ -6,7 +6,8 @@ import { useQuery } from '@tanstack/react-query'
 import { generateTable } from '@/app/actions'
 import TableDisplay from '@/components/table-display'
 import type { TableData } from '@/lib/types'
-import PromptInputArea from '@/components/prompt-input-area'
+import PromptInput from '@/components/prompt-input'
+import PromptError from '@/components/prompt-error'
 import { placeholderTableData } from '@/lib/placeholder-data'
 
 export default function Home() {
@@ -41,13 +42,13 @@ export default function Home() {
         <div
           className={`w-full max-w-5xl xl:max-w-none xl:sticky xl:top-8 xl:self-start`}
         >
-          <PromptInputArea
+          <PromptInput
             prompt={prompt}
             handlePromptChange={setPrompt}
             handleSubmit={setSubmittedPrompt}
             isLoading={queryIsFetching}
-            error={currentError}
           />
+          {currentError && <PromptError error={currentError} />}
         </div>
 
         {/* Table Area - takes full width on small, middle column on large */}
