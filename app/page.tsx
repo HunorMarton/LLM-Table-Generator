@@ -1,7 +1,8 @@
 'use client'
 
 import type React from 'react'
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { generateTable } from '@/app/actions'
 import TableDisplay from '@/components/table-display'
 import type { TableData } from '@/lib/types'
@@ -10,52 +11,23 @@ import { placeholderTableData } from '@/lib/placeholder-data'
 
 export default function Home() {
   const [prompt, setPrompt] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [tableData, setTableData] = useState<TableData | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [isCurrentDataStale, setIsCurrentDataStale] = useState(false)
-  const [prevSubmittedPrompt, setPrevSubmittedPrompt] = useState('')
+  const [submittedPrompt, setSubmittedPrompt] = useState('')
 
-  const handlePromptChange = useCallback(
-    (newPrompt: string) => {
-      setPrompt(newPrompt)
-      if (tableData) {
-        setIsCurrentDataStale(newPrompt !== prevSubmittedPrompt)
-      }
-    },
-    [tableData, prevSubmittedPrompt, setIsCurrentDataStale]
-  )
+  const {
+    data: tableData,
+    isFetching: queryIsFetching,
+    error: queryError,
+  } = useQuery<TableData, Error>({
+    queryKey: ['tableData', submittedPrompt],
+    queryFn: async () => generateTable(submittedPrompt),
+    initialData: placeholderTableData,
+    enabled: !!submittedPrompt,
+    retry: 1,
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!prompt.trim()) return
-
-    if (tableData) {
-      setIsCurrentDataStale(true)
-    }
-
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const data = await generateTable(prompt)
-      setTableData(data)
-      setIsCurrentDataStale(false)
-      setPrevSubmittedPrompt(prompt)
-    } catch (err) {
-      console.error('Error generating table:', err)
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to generate table. Please try again.'
-      )
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const displayData = tableData || placeholderTableData
-  const shouldTableBeStale = !tableData || isCurrentDataStale
+  const isDisplayStale =
+    !submittedPrompt || queryIsFetching || prompt !== submittedPrompt
+  const currentError = queryError ? queryError.message : null
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#F4F4F1]">
@@ -71,17 +43,16 @@ export default function Home() {
         >
           <PromptInputArea
             prompt={prompt}
-            handlePromptChange={handlePromptChange}
-            handleSubmit={handleSubmit}
-            isLoading={isLoading}
-            error={error}
+            handlePromptChange={setPrompt}
+            handleSubmit={setSubmittedPrompt}
+            isLoading={queryIsFetching}
+            error={currentError}
           />
         </div>
 
         {/* Table Area - takes full width on small, middle column on large */}
         <div className="w-full max-w-5xl mx-auto xl:max-w-none xl:min-w-[640px] xl:flex xl:items-center xl:justify-center xl:h-full">
-          {/* Render TableDisplay with actual data or placeholder data */}
-          <TableDisplay tableData={displayData} isStale={shouldTableBeStale} />
+          <TableDisplay tableData={tableData} isStale={isDisplayStale} />
         </div>
 
         {/* Empty Third Column (for large screen layout) - hidden on small screens by grid behavior */}

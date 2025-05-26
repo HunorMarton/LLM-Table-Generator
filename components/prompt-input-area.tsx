@@ -9,7 +9,7 @@ import { MIN_TEXTAREA_HEIGHT } from '@/lib/constants'
 interface PromptInputAreaProps {
   prompt: string
   handlePromptChange: (newPrompt: string) => void
-  handleSubmit: (e: React.FormEvent) => Promise<void>
+  handleSubmit: (prompt: string) => void
   isLoading: boolean
   error: string | null
 }
@@ -37,7 +37,10 @@ const PromptInputArea: React.FC<PromptInputAreaProps> = ({
   return (
     <div className="w-full">
       <form
-        onSubmit={handleSubmit}
+        onSubmit={(e) => {
+          e.preventDefault()
+          handleSubmit(prompt)
+        }}
         className="relative rounded-lg border border-white/20 bg-white/90 backdrop-blur-sm shadow-lg"
       >
         <textarea
