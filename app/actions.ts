@@ -59,6 +59,7 @@ ONLY RESPOND WITH THE JSON OBJECT, NO ADDITIONAL TEXT.
       prompt: `Generate a table based on this request: "${prompt}". Make sure to include appropriate columns and sample data that would be useful for this type of table.`,
       temperature: 0.7,
       maxTokens: 2000,
+      experimental_telemetry: { isEnabled: true },
     })
 
     rawResponseText = text // Store the raw text from the AI model

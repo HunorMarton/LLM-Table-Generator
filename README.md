@@ -14,6 +14,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ## Environment Variables
 
 - `GOOGLE_GENERATIVE_AI_API_KEY` - Your Google Generative AI API key
+- `LANGFUSE_SECRET_KEY` - Langfuse secret key
+- `LANGFUSE_PUBLIC_KEY`- Langfuse public key
 
 ## Getting Started
 
