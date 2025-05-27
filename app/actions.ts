@@ -3,6 +3,13 @@
 import { generateText } from 'ai'
 import { google } from '@ai-sdk/google'
 import type { TableData } from '@/lib/types'
+import { Langfuse } from 'langfuse'
+
+const langfuse = new Langfuse()
+
+const fetchedPrompt = await langfuse.getPrompt('generate-table', undefined, {
+  type: 'chat',
+})
 
 export async function generateTable(prompt: string): Promise<TableData> {
   let rawResponseText = '' // Variable to store raw response text from the model
@@ -15,51 +22,22 @@ export async function generateTable(prompt: string): Promise<TableData> {
       )
     }
 
-    const systemPrompt = `
-You are a table generator that creates structured data based on user prompts.
-You will generate a JSON object that represents a table with the following structure:
-{
-  "title": "Title of the table",
-  "columns": [
-    { "key": "name", "label": "Name" },
-    // Add more columns as needed
-  ],
-  "rows": [
-    {
-      "name": "Example Name",
-      "name_icon": "file", // Optional icon key (file, payment, chart, message, check)
-      // Add more fields corresponding to column keys
-      "actions": [
-        { "type": "edit", "label": "Edit", "primary": true },
-        { "type": "delete", "label": "Delete", "primary": true },
-        { "type": "view", "label": "View", "primary": false },
-        // Add more actions as appropriate for the context
-      ]
-    }
-    // Add more rows as needed
-  ]
-}
-
-For the "actions" array in each row, include 3-5 contextually appropriate actions.
-Mark 1-2 actions as "primary": true to indicate they should be highlighted.
-Valid action types include: edit, delete, view, download, share, archive, restore, approve, reject, assign, complete, duplicate, print, export, preview, comment, bookmark.
-Choose actions that make sense for the specific table context.
-
-The first column should typically be a name or title column.
-Each row should always include an "actions" array.
-Include 4-6 rows of realistic, diverse data.
-For icons, use one of these values: "file", "payment", "chart", "message", "check".
-Make sure all JSON is valid and properly formatted.
-ONLY RESPOND WITH THE JSON OBJECT, NO ADDITIONAL TEXT.
-`
+    const compiledPrompt = fetchedPrompt.compile({ prompt })
+    const systemPrompt = compiledPrompt.find((p) => p.role == 'system')?.content
+    const userPrompt = compiledPrompt.find((p) => p.role == 'user')?.content
 
     const { text } = await generateText({
       model: google('gemini-2.5-flash-preview-05-20'),
       system: systemPrompt,
-      prompt: `Generate a table based on this request: "${prompt}". Make sure to include appropriate columns and sample data that would be useful for this type of table.`,
+      prompt: userPrompt,
       temperature: 0.7,
       maxTokens: 2000,
-      experimental_telemetry: { isEnabled: true },
+      experimental_telemetry: {
+        isEnabled: true,
+        metadata: {
+          langfusePrompt: fetchedPrompt.toJSON(),
+        },
+      },
     })
 
     rawResponseText = text // Store the raw text from the AI model
